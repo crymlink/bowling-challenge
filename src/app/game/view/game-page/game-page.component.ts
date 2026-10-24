@@ -1,8 +1,8 @@
 import { Component, Injector, afterNextRender, inject, viewChild } from '@angular/core';
-import { GameViewService } from '../../view/game-view.service';
-import { GameControlsComponent } from '../game-controls/game-controls.component';
-import { RollInputComponent } from '../roll-input/roll-input.component';
-import { ScoreSheetComponent } from '../score-sheet/score-sheet.component';
+import { GameViewService } from '../game-view.service';
+import { GameControlsComponent } from '../../components/game-controls/game-controls.component';
+import { RollInputComponent } from '../../components/roll-input/roll-input.component';
+import { ScoreSheetComponent } from '../../components/score-sheet/score-sheet.component';
 
 /**
  * Container for the game. Wires the presentational components to the view service

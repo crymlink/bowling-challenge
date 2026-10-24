@@ -1,6 +1,6 @@
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { GameState, PinCount } from '../domain/bowling.models';
+import { PinCount } from '../domain/bowling.models';
 import {
   buildFrames,
   currentPosition,
@@ -9,6 +9,10 @@ import {
   pinsStanding,
   totalScore,
 } from '../domain/bowling.rules';
+
+interface GameState {
+  readonly rolls: readonly PinCount[];
+}
 
 const initialState: GameState = { rolls: [] };
 

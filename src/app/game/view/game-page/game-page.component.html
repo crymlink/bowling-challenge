@@ -2,26 +2,29 @@
   <h1>Bowling score</h1>
 
   <p class="status">
-    <strong>{{ game.positionLabel() }}</strong>
-    @if (store.isGameOver()) {
-      — final score {{ store.totalScore() }}
-    } @else {
+    @if (store.currentPosition(); as position) {
+      <strong>Frame {{ position.frame }} · Roll {{ position.roll }}</strong>
       · {{ store.pinsStanding() }} pins standing
+    } @else {
+      <strong>Game over</strong> — final score {{ store.totalScore() }}
     }
   </p>
 
   <app-roll-input
     [position]="store.currentPosition()"
     [pinsStanding]="store.pinsStanding()"
-    (roll)="game.roll($event)"
-    (randomRoll)="game.rollRandom()"
+    (roll)="store.roll($event)"
   />
 
-  <app-game-controls [gameOver]="store.isGameOver()" (newGame)="game.newGame()" />
+  <div class="controls">
+    <button type="button" [class.primary]="store.isGameOver()" (click)="store.reset()">
+      New game
+    </button>
+  </div>
 
   <app-score-sheet
     [frames]="store.frames()"
-    [currentFrame]="game.currentFrame()"
+    [currentFrame]="store.currentPosition()?.frame ?? null"
     [totalScore]="store.totalScore()"
   />
 </div>

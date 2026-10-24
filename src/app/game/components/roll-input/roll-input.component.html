@@ -12,7 +12,7 @@
     <button type="submit" class="primary" [disabled]="gameOver() || rollForm().invalid()">
       Roll
     </button>
-    <button type="button" [disabled]="gameOver()" (click)="randomRoll.emit()">Random</button>
+    <button type="button" [disabled]="gameOver()" (click)="rollRandom()">Random</button>
   </div>
   <p class="hint">
     @if (gameOver()) {

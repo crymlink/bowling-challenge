@@ -17,7 +17,8 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
-import { RollPosition } from '../../domain/bowling.models';
+import { PinCount, RollPosition } from '../../domain/bowling.models';
+import { isPinCount } from '../../domain/bowling.rules';
 
 interface RollFormModel {
   pins: number;
@@ -34,10 +35,10 @@ const initialModel: RollFormModel = { pins: 0 };
 export class RollInputComponent {
   /** Where the next roll will be played, or `null` when the game is over. */
   readonly position = input.required<RollPosition | null>();
-  readonly pinsStanding = input.required<number>();
+  readonly pinsStanding = input.required<PinCount>();
 
-  readonly roll = output<number>();
-  readonly randomRoll = output<void>();
+  /** A typed or random roll, always a possible pin count. */
+  readonly roll = output<PinCount>();
 
   private readonly pinsInput = viewChild.required<ElementRef<HTMLInputElement>>('pinsInput');
 
@@ -67,7 +68,7 @@ export class RollInputComponent {
     {
       submission: {
         action: async (field) => {
-          this.roll.emit(field.pins().value());
+          this.emitRoll(field.pins().value());
           this.clear();
           this.focus();
         },
@@ -80,6 +81,18 @@ export class RollInputComponent {
     const pins = this.rollForm.pins();
     return pins.touched() || pins.dirty() ? (pins.errors()[0]?.message ?? '') : '';
   });
+
+  /** Knocks down a random number of the standing pins, from none to all of them. */
+  protected rollRandom(): void {
+    this.emitRoll(Math.floor(Math.random() * (this.pinsStanding() + 1)));
+  }
+
+  /** The form already rejects anything else; this narrows the number to a `PinCount`. */
+  private emitRoll(pins: number): void {
+    if (isPinCount(pins)) {
+      this.roll.emit(pins);
+    }
+  }
 
   /** Resets the value and the touched/dirty state, so no stale error is shown. */
   private clear(): void {

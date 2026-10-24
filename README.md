@@ -37,8 +37,8 @@ npm run build    # Produktions-Build nach dist/
 src/app/game/
 ├── domain/       Regeln und Modelle, reines TypeScript ohne Angular
 ├── data-access/  GameStore (NgRx Signal Store), hält nur die Liste der Würfe; Ort für spätere API-Anbindung
-├── view/         Spielseite und GameViewService, verbinden Store und Komponenten
-└── components/   Darstellende Komponenten: Eingabe, Spielblatt, Frame, Steuerung
+├── view/         Spielseite, verbindet Store und Komponenten
+└── components/   Darstellende Komponenten: Eingabe, Spielblatt, Frame
 ```
 
 **Die Würfe sind die einzige Quelle der Wahrheit.** Der Store speichert nur die umgeworfenen Pins
@@ -60,8 +60,11 @@ zeigt Fehlermeldungen an. Der Store prüft jeden Wurf zusätzlich gegen die Rege
 Aufrufer keinen ungültigen Zustand erzeugen können.
 
 **Darstellung getrennt von Logik.** Die Komponenten bekommen ihre Daten über `input()` und melden
-Aktionen über `output()`. Die Notation des Spielblatts (`X`, `/`, `-`) steckt im
-`FrameNotationService`, nicht im Store, weil sie nur die Anzeige betrifft.
+Aktionen über `output()`. Die Spielseite injiziert nur den Store, gibt seine Signals an die
+Komponenten weiter und reicht deren Würfe an den Store zurück. Die Eingabe meldet jeden Wurf,
+eingetippt oder zufällig, als gültige Pin-Anzahl. Die Notation des Spielblatts (`X`, `/`, `-`) ist
+die reine Funktion `toMarks` neben der Frame-Komponente, nicht Teil des Stores, weil sie nur die
+Anzeige betrifft.
 
 ### Verwendete Technik
 
@@ -82,7 +85,7 @@ sodass die Regeln umgebaut werden können, ohne die Tests anzupassen. Abgedeckt 
   Spiels mit laufender Summe
 - ausstehende Boni, die erlaubten Würfe nach Strike oder Spare im 10. Frame und das Spielende
 
-Zusätzlich gibt es Tests für Store, View-Service, Eingabekomponente, Notation und Routing.
+Zusätzlich gibt es Tests für Store, Spielseite, Eingabekomponente, Notation und Routing.
 
 ## Vorgehen
 

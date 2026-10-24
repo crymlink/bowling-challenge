@@ -1,15 +1,13 @@
-import { TestBed } from '@angular/core/testing';
 import { PinCount } from '../../domain/bowling.models';
 import { buildFrames } from '../../domain/bowling.rules';
-import { FrameNotationService } from './frame-notation.service';
+import { toMarks } from './frame-notation';
 
 /**
- * These tests describe how a score sheet is written, not the methods behind it.
+ * These tests describe how a score sheet is written, not the functions behind it.
  * `sheet()` is the only place that knows the notation API.
  */
 function sheet(...rolls: PinCount[]) {
-  const notation = TestBed.inject(FrameNotationService);
-  return buildFrames(rolls).map((frame) => notation.toMarks(frame));
+  return buildFrames(rolls).map(toMarks);
 }
 
 /** Rolls that leave frames 1–9 open with 0 pins, so a test can focus on frame 10. */

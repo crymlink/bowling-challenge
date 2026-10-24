@@ -36,7 +36,7 @@ export class RollInputComponent {
   protected readonly rollForm = form(
     this.model,
     (path) => {
-      disabled(path.pins, () => this.gameOver());
+      disabled(path.pins, { when: () => this.gameOver() });
       required(path.pins, { message: 'Enter the number of pins.' });
       validate(path.pins, ({ value }) =>
         Number.isInteger(value())

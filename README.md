@@ -49,11 +49,11 @@ dieses eine Array.
 
 **Die Regeln sind frameworkfrei.** `domain/bowling.rules.ts` besteht aus reinen Funktionen ohne
 Abhängigkeit zu Angular. Die Berechnung folgt direkt der Aufgabenbeschreibung: Strike = 10 + die
-nächsten zwei Würfe, Spare = 10 + der nächste Wurf, offener Frame = Pins beider Würfe. Im 10. Frame
-sind die nächsten Würfe einfach seine eigenen Bonuswürfe, daher braucht die Berechnung dafür keinen
-Sonderfall. Ein Sonderfall für den 10. Frame wird nur beim Aufteilen der Würfe und beim Aufstellen
-neuer Pins benötigt. Die Anzahl der Würfe und Bonuswürfe ist als benannte Konstante hinterlegt,
-nicht als Zahl im Code.
+nächsten zwei Würfe, Spare = 10 + der nächste Wurf, offener Frame = Pins beider Würfe. Strike und
+Spare zählen damit beide drei Würfe in Folge ab ihrem ersten Wurf, ein offener Frame zwei. Im 10.
+Frame sind die nächsten Würfe einfach seine eigenen Bonuswürfe, daher braucht die Berechnung dafür
+keinen Sonderfall. Ein Sonderfall für den 10. Frame wird nur beim Aufteilen der Würfe und beim
+Aufstellen neuer Pins benötigt.
 
 **Validierung auf zwei Ebenen.** Das Formular (Signal Forms) prüft die Eingabe für den Nutzer und
 zeigt Fehlermeldungen an. Der Store prüft jeden Wurf zusätzlich gegen die Regeln, damit auch andere
@@ -62,9 +62,8 @@ Aufrufer keinen ungültigen Zustand erzeugen können.
 **Darstellung getrennt von Logik.** Die Komponenten bekommen ihre Daten über `input()` und melden
 Aktionen über `output()`. Die Spielseite injiziert nur den Store, gibt seine Signals an die
 Komponenten weiter und reicht deren Würfe an den Store zurück. Die Eingabe meldet jeden Wurf,
-eingetippt oder zufällig, als gültige Pin-Anzahl. Die Notation des Spielblatts (`X`, `/`, `-`) ist
-die reine Funktion `toMarks` neben der Frame-Komponente, nicht Teil des Stores, weil sie nur die
-Anzeige betrifft.
+eingetippt oder zufällig, als gültige Pin-Anzahl. Die Notation des Spielblatts (`X`, `/`, `-`)
+steckt in der Frame-Komponente, nicht im Store, weil sie nur die Anzeige betrifft.
 
 ### Verwendete Technik
 
@@ -85,7 +84,8 @@ sodass die Regeln umgebaut werden können, ohne die Tests anzupassen. Abgedeckt 
   Spiels mit laufender Summe
 - ausstehende Boni, die erlaubten Würfe nach Strike oder Spare im 10. Frame und das Spielende
 
-Zusätzlich gibt es Tests für Store, Spielseite, Eingabekomponente, Notation und Routing.
+Zusätzlich gibt es Tests für Store, Spielseite, Eingabe- und Frame-Komponente (Notation) und
+Routing.
 
 ## Vorgehen
 

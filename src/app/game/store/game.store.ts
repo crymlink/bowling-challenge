@@ -34,7 +34,7 @@ export const GameStore = signalStore(
   withMethods((store) => ({
     /** Records a roll. Invalid rolls are ignored as a domain-level safety net. */
     roll(pins: PinCount): void {
-      if (!isValidRoll(store.rolls(), pins)) {
+      if (!isValidRoll(store.frames(), pins)) {
         return;
       }
       patchState(store, { rolls: [...store.rolls(), pins] });

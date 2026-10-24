@@ -5,7 +5,7 @@ export const routes: Routes = [
     path: '',
     title: 'Bowling Score',
     loadComponent: () =>
-      import('./game/components/game-page/game-page.component').then((m) => m.GamePageComponent),
+      import('./game/view/game-page/game-page.component').then((m) => m.GamePageComponent),
   },
   { path: '**', redirectTo: '' },
 ];

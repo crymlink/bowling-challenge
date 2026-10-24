@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { GameStore } from '../../store/game.store';
+import { GameStore } from '../../data-access/game.store';
 import { GameViewService } from './game-view.service';
 import { GameControlsComponent } from '../../components/game-controls/game-controls.component';
 import { RollInputComponent } from '../../components/roll-input/roll-input.component';

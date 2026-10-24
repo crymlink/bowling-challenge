@@ -36,7 +36,7 @@ npm run build    # Produktions-Build nach dist/
 ```
 src/app/game/
 ├── domain/       Regeln und Modelle, reines TypeScript ohne Angular
-├── store/        GameStore (NgRx Signal Store), hält nur die Liste der Würfe
+├── data-access/  GameStore (NgRx Signal Store), hält nur die Liste der Würfe; Ort für spätere API-Anbindung
 ├── view/         Spielseite und GameViewService, verbinden Store und Komponenten
 └── components/   Darstellende Komponenten: Eingabe, Spielblatt, Frame, Steuerung
 ```

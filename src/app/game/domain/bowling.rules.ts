@@ -1,4 +1,4 @@
-import { Frame, FrameType, PinCount, RollPosition } from './bowling.models';
+import { Frame, FrameType, PinCount, RackRoll, RollPosition } from './bowling.models';
 
 /**
  * Pure bowling scoring rules. Framework-free on purpose: everything is derived
@@ -18,6 +18,10 @@ const SCORED_ROLLS: Record<Exclude<FrameType, 'incomplete'>, number> = {
   spare: 3,
   open: 2,
 };
+
+type Rack = Omit<RackRoll, 'pins'>;
+
+const FRESH_RACK: Rack = { standing: MAX_PINS, isFirstBall: true };
 
 export function isPinCount(value: number): value is PinCount {
   return Number.isInteger(value) && value >= 0 && value <= MAX_PINS;
@@ -63,15 +67,26 @@ export function currentPosition(frames: readonly Frame[]): RollPosition | null {
 /** Maximum number of pins the next roll can knock down; 0 when the game is over. */
 export function pinsStanding(frames: readonly Frame[]): PinCount {
   const frame = currentFrame(frames);
-  if (!frame) {
-    return 0;
-  }
-  // Knocking down all pins resets the rack; mid-frame that only happens in frame 10.
-  return toPinCount(MAX_PINS - (sum(frame.rolls) % MAX_PINS));
+  return frame ? frame.rolls.reduce(nextRack, FRESH_RACK).standing : 0;
 }
 
 export function isValidRoll(frames: readonly Frame[], pins: PinCount): boolean {
   return !isGameOver(frames) && pins <= pinsStanding(frames);
+}
+
+/** Each roll of a frame with the rack it was thrown at, e.g. to tell a spare from a strike. */
+export function rackRolls(frameRolls: readonly PinCount[]): RackRoll[] {
+  let rack = FRESH_RACK;
+  return frameRolls.map((pins) => {
+    const rackRoll = { pins, ...rack };
+    rack = nextRack(rack, pins);
+    return rackRoll;
+  });
+}
+
+/** Rolls a frame can hold: 2 in frames 1–9, 3 in frame 10 including its bonus rolls. */
+export function maxRollsInFrame(frameNumber: number): number {
+  return frameNumber === FRAME_COUNT ? 3 : 2;
 }
 
 /** Frames 1–9 end after a strike or after two rolls. */
@@ -108,6 +123,13 @@ function currentFrame(frames: readonly Frame[]): Frame | undefined {
 /** Frames 1–9 are finished once classified; frame 10 once its score is known. */
 function isFrameFinished(frame: Frame): boolean {
   return frame.number === FRAME_COUNT ? frame.score !== null : frame.type !== 'incomplete';
+}
+
+/** Knocking down all standing pins sets up a fresh rack; mid-frame that only happens in frame 10. */
+function nextRack(rack: Rack, pins: PinCount): Rack {
+  return pins === rack.standing
+    ? FRESH_RACK
+    : { standing: toPinCount(rack.standing - pins), isFirstBall: false };
 }
 
 function sum(pins: readonly PinCount[]): number {

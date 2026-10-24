@@ -1,6 +1,5 @@
 import { computed } from '@angular/core';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { PinCount } from '../domain/bowling.models';
 import {
   buildFrames,
   currentPosition,
@@ -11,7 +10,7 @@ import {
 } from '../domain/bowling.rules';
 
 interface GameState {
-  readonly rolls: readonly PinCount[];
+  readonly rolls: readonly number[];
 }
 
 const initialState: GameState = { rolls: [] };
@@ -36,7 +35,7 @@ export const GameStore = signalStore(
   }),
   withMethods((store) => ({
     /** Records a roll. Invalid rolls are ignored as a domain-level safety net. */
-    roll(pins: PinCount): void {
+    roll(pins: number): void {
       if (!isValidRoll(store.frames(), pins)) {
         return;
       }

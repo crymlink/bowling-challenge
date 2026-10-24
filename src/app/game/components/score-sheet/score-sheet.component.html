@@ -2,8 +2,14 @@
   <h2>Score sheet</h2>
   <ol class="frames">
     @for (frame of frames(); track frame.number) {
-      <li>
-        <app-frame [frame]="frame" [class.current]="frame.number === currentFrame()" />
+      <li class="frame" [class.current]="frame.number === currentFrame()">
+        <span class="frame-number">{{ frame.number }}</span>
+        <span class="marks">
+          @for (mark of frame | frameMarks; track $index) {
+            <span class="mark">{{ mark }}</span>
+          }
+        </span>
+        <span class="running-total">{{ frame.runningTotal ?? '' }}</span>
       </li>
     }
   </ol>

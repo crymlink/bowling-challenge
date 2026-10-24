@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { PinCount } from '../domain/bowling.models';
 import { GameStore } from './game.store';
 
 /**
@@ -7,14 +6,14 @@ import { GameStore } from './game.store';
  * The rules themselves are covered by the bowling rules tests; here we only check that the
  * store wires them up. `game()` is the only place that knows how the store is created and fed.
  */
-function game(...rolls: PinCount[]) {
+function game(...rolls: number[]) {
   const store = TestBed.inject(GameStore);
   rolls.forEach((pins) => store.roll(pins));
   return store;
 }
 
 /** Repeats a sequence of rolls, e.g. `repeat(9, 10)` for nine strikes. */
-function repeat(times: number, ...rolls: PinCount[]): PinCount[] {
+function repeat(times: number, ...rolls: number[]): number[] {
   return Array.from({ length: times }, () => rolls).flat();
 }
 

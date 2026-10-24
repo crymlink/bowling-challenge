@@ -1,9 +1,7 @@
-import { PinCount } from './bowling.models';
 import {
   buildFrames,
   currentPosition,
   isGameOver,
-  isPinCount,
   isValidRoll,
   pinsStanding,
   totalScore,
@@ -14,7 +12,7 @@ import {
  * `play()` is the only place that knows the rules API, so the implementation can be
  * refactored freely as long as the game still behaves the same.
  */
-function play(...rolls: PinCount[]) {
+function play(...rolls: number[]) {
   const frames = buildFrames(rolls);
   return {
     frames,
@@ -22,22 +20,21 @@ function play(...rolls: PinCount[]) {
     scores: frames.map((frame) => frame.score),
     runningTotals: frames.map((frame) => frame.runningTotal),
     rollsPerFrame: frames.map((frame) => frame.rolls),
-    types: frames.map((frame) => frame.type),
     position: currentPosition(frames),
     pinsStanding: pinsStanding(frames),
     isGameOver: isGameOver(frames),
-    canRoll: (pins: PinCount) => isValidRoll(frames, pins),
+    canRoll: (pins: number) => isValidRoll(frames, pins),
   };
 }
 
 /** Repeats a sequence of rolls, e.g. `repeat(9, 10)` for nine strikes. */
-function repeat(times: number, ...rolls: PinCount[]): PinCount[] {
+function repeat(times: number, ...rolls: number[]): number[] {
   return Array.from({ length: times }, () => rolls).flat();
 }
 
 describe('bowling rules', () => {
   describe('scoring complete games', () => {
-    it.each<{ name: string; expected: number; rolls: PinCount[] }>([
+    it.each<{ name: string; expected: number; rolls: number[] }>([
       { name: 'gutter game', expected: 0, rolls: repeat(20, 0) },
       { name: 'all ones', expected: 20, rolls: repeat(20, 1) },
       { name: 'all nine-miss', expected: 90, rolls: repeat(10, 9, 0) },
@@ -97,18 +94,6 @@ describe('bowling rules', () => {
       const game = play(3, 4, 5);
 
       expect(game.rollsPerFrame.slice(0, 2)).toEqual([[3, 4], [5]]);
-    });
-
-    it('classifies frames as strike, spare, open or incomplete', () => {
-      const game = play(10, 7, 3, 4, 5, 6);
-
-      expect(game.types.slice(0, 5)).toEqual([
-        'strike',
-        'spare',
-        'open',
-        'incomplete',
-        'incomplete',
-      ]);
     });
 
     it('the tenth frame holds its bonus rolls', () => {
@@ -208,7 +193,7 @@ describe('bowling rules', () => {
       expect(game.canRoll(4)).toBe(false);
     });
 
-    it.each<{ name: string; tenthFrame: PinCount[]; standing: PinCount }>([
+    it.each<{ name: string; tenthFrame: number[]; standing: number }>([
       { name: 'a strike', tenthFrame: [10], standing: 10 },
       { name: 'a strike and 3 pins', tenthFrame: [10, 3], standing: 7 },
       { name: 'two strikes', tenthFrame: [10, 10], standing: 10 },
@@ -226,15 +211,9 @@ describe('bowling rules', () => {
       expect(game.pinsStanding).toBe(0);
       expect(game.canRoll(0)).toBe(false);
     });
-  });
 
-  describe('pin counts', () => {
-    it.each([0, 5, 10])('%d is a valid pin count', (value) => {
-      expect(isPinCount(value)).toBe(true);
-    });
-
-    it.each([-1, 11, 2.5, Number.NaN])('%d is not a valid pin count', (value) => {
-      expect(isPinCount(value)).toBe(false);
+    it.each([-1, 11, 2.5, Number.NaN])('%d is never a valid roll', (pins) => {
+      expect(play().canRoll(pins)).toBe(false);
     });
   });
 });

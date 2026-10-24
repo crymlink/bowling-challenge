@@ -2,21 +2,9 @@
   <h2 id="score-sheet-heading">Score sheet</h2>
   <ol class="frames">
     @for (frame of frames(); track frame.number) {
-      <li
-        class="frame"
-        [class.current]="frame.isCurrent"
-        [attr.aria-current]="frame.isCurrent ? 'step' : null"
-      >
-        <span class="visually-hidden">{{ frame.description }}</span>
-        <div class="frame-visual" aria-hidden="true">
-          <span class="frame-number">{{ frame.number }}</span>
-          <span class="marks">
-            @for (mark of frame.marks; track $index) {
-              <span class="mark">{{ mark ?? '' }}</span>
-            }
-          </span>
-          <span class="running-total">{{ frame.runningTotal ?? '' }}</span>
-        </div>
+      @let isCurrent = frame.number === currentFrame();
+      <li [attr.aria-current]="isCurrent ? 'step' : null">
+        <app-frame [frame]="frame" [current]="isCurrent" />
       </li>
     }
   </ol>

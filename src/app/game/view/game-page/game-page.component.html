@@ -24,7 +24,11 @@
     (newGame)="newGame()"
   />
 
-  <app-score-sheet [frames]="game.frames()" [totalScore]="game.totalScore()" />
+  <app-score-sheet
+    [frames]="game.frames()"
+    [currentFrame]="game.currentFrame()"
+    [totalScore]="game.totalScore()"
+  />
 
   <p class="visually-hidden" aria-live="polite">{{ game.announcement() }}</p>
 </main>

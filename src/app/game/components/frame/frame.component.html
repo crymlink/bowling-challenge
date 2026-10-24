@@ -1,0 +1,7 @@
+<span class="frame-number">{{ frame().number }}</span>
+<span class="marks">
+  @for (mark of marks(); track $index) {
+    <span class="mark">{{ mark ?? '' }}</span>
+  }
+</span>
+<span class="running-total">{{ frame().runningTotal ?? '' }}</span>

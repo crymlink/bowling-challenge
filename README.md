@@ -38,7 +38,7 @@ src/app/game/
 ├── domain/       Regeln und Modelle, reines TypeScript ohne Angular
 ├── data-access/  GameStore (NgRx Signal Store), hält nur die Liste der Würfe; Ort für spätere API-Anbindung
 ├── view/         Spielseite, verbindet Store und Komponenten
-└── components/   Darstellende Komponenten: Eingabe, Spielblatt, Frame
+└── components/   Darstellende Komponenten: Eingabe, Spielblatt
 ```
 
 **Die Würfe sind die einzige Quelle der Wahrheit.** Der Store speichert nur die umgeworfenen Pins
@@ -63,7 +63,8 @@ Aufrufer keinen ungültigen Zustand erzeugen können.
 Aktionen über `output()`. Die Spielseite injiziert nur den Store, gibt seine Signals an die
 Komponenten weiter und reicht deren Würfe an den Store zurück. Die Eingabe meldet jeden Wurf,
 eingetippt oder zufällig, als gültige Pin-Anzahl. Die Notation des Spielblatts (`X`, `/`, `-`)
-steckt in der Frame-Komponente, nicht im Store, weil sie nur die Anzeige betrifft.
+steckt in der Pipe `FrameMarksPipe` neben dem Spielblatt, nicht im Store, weil sie nur die Anzeige
+betrifft.
 
 ### Verwendete Technik
 
@@ -84,7 +85,7 @@ sodass die Regeln umgebaut werden können, ohne die Tests anzupassen. Abgedeckt 
   Spiels mit laufender Summe
 - ausstehende Boni, die erlaubten Würfe nach Strike oder Spare im 10. Frame und das Spielende
 
-Zusätzlich gibt es Tests für Store, Spielseite, Eingabe- und Frame-Komponente (Notation) und
+Zusätzlich gibt es Tests für Store, Spielseite, Eingabe, Notation (`FrameMarksPipe`) und
 Routing.
 
 ## Vorgehen

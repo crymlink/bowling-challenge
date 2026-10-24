@@ -110,6 +110,18 @@ describe('GamePageComponent', () => {
     expect(page.frames()[9]).toEqual({ marks: '5 3', total: '80' });
   });
 
+  it('clears a typed value when a random roll moves the game on', async () => {
+    // A random roll of 0.3 knocks down 3 of the 10 standing pins.
+    vi.spyOn(Math, 'random').mockReturnValue(0.3);
+    const page = await render();
+    await page.type('8');
+    await page.click('random');
+
+    expect(page.status()).toBe('Frame 1 · Roll 2 · 7 pins standing');
+    expect(page.inputValue()).toBe('0');
+    expect(page.error()).toBe('');
+  });
+
   it('starts a new game and clears the input', async () => {
     const page = await render();
     await page.roll(10, 10, 10);

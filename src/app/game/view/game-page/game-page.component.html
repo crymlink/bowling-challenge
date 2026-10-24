@@ -11,13 +11,13 @@
   </p>
 
   <app-roll-input
-    [maxPins]="store.pinsStanding()"
-    [gameOver]="store.isGameOver()"
+    [position]="store.currentPosition()"
+    [pinsStanding]="store.pinsStanding()"
     (roll)="game.roll($event)"
     (randomRoll)="game.rollRandom()"
   />
 
-  <app-game-controls [gameOver]="store.isGameOver()" (newGame)="newGame()" />
+  <app-game-controls [gameOver]="store.isGameOver()" (newGame)="game.newGame()" />
 
   <app-score-sheet
     [frames]="store.frames()"

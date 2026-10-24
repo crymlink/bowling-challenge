@@ -1,4 +1,12 @@
-import { Component, ElementRef, computed, input, output, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  input,
+  linkedSignal,
+  output,
+  viewChild,
+} from '@angular/core';
 import {
   FormField,
   FormRoot,
@@ -9,6 +17,7 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
+import { RollPosition } from '../../domain/bowling.models';
 
 interface RollFormModel {
   pins: number;
@@ -23,15 +32,22 @@ const initialModel: RollFormModel = { pins: 0 };
   styleUrl: './roll-input.component.scss',
 })
 export class RollInputComponent {
-  readonly maxPins = input.required<number>();
-  readonly gameOver = input.required<boolean>();
+  /** Where the next roll will be played, or `null` when the game is over. */
+  readonly position = input.required<RollPosition | null>();
+  readonly pinsStanding = input.required<number>();
 
   readonly roll = output<number>();
   readonly randomRoll = output<void>();
 
   private readonly pinsInput = viewChild.required<ElementRef<HTMLInputElement>>('pinsInput');
 
-  private readonly model = signal<RollFormModel>({ ...initialModel });
+  protected readonly gameOver = computed(() => this.position() === null);
+
+  /** Starts over whenever the game moves on, so a value typed for an earlier roll never lingers. */
+  private readonly model = linkedSignal<RollPosition | null, RollFormModel>({
+    source: this.position,
+    computation: () => ({ ...initialModel }),
+  });
 
   protected readonly rollForm = form(
     this.model,
@@ -44,8 +60,8 @@ export class RollInputComponent {
           : { kind: 'integer', message: 'Enter a whole number.' },
       );
       min(path.pins, 0, { message: 'The number of pins cannot be negative.' });
-      max(path.pins, () => this.maxPins(), {
-        message: () => `Only ${this.maxPins()} pins are standing.`,
+      max(path.pins, () => this.pinsStanding(), {
+        message: () => `Only ${this.pinsStanding()} pins are standing.`,
       });
     },
     {
@@ -66,7 +82,7 @@ export class RollInputComponent {
   });
 
   /** Resets the value and the touched/dirty state, so no stale error is shown. */
-  clear(): void {
+  private clear(): void {
     this.rollForm().reset({ ...initialModel });
   }
 

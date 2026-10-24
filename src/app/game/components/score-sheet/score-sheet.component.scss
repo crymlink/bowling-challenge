@@ -15,45 +15,6 @@ h2 {
     grid-template-columns: repeat(9, minmax(0, 1fr)) minmax(0, 1.4fr);
   }
 }
-.frame {
-  border: 2px solid var(--color-border);
-  border-radius: 0.375rem;
-  background: var(--color-surface);
-}
-.frame.current {
-  border-color: var(--color-primary);
-  background: var(--color-highlight);
-}
-.frame-visual {
-  display: grid;
-  grid-template-rows: auto auto 2.25rem;
-  text-align: center;
-}
-.frame-number {
-  font-size: 0.875rem;
-  color: var(--color-muted);
-  border-bottom: 1px solid var(--color-border);
-}
-.marks {
-  display: flex;
-  justify-content: flex-end;
-}
-.mark {
-  flex: 1;
-  min-height: 1.75rem;
-  line-height: 1.75rem;
-  font-weight: 600;
-  border-left: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
-.mark:first-child {
-  border-left: none;
-}
-.running-total {
-  font-size: 1.125rem;
-  font-weight: 700;
-  line-height: 2.25rem;
-}
 .total-score {
   font-size: 1.25rem;
   margin: 0.75rem 0 0;

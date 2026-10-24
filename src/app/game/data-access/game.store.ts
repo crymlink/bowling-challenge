@@ -3,9 +3,9 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { PinCount } from '../domain/bowling.models';
 import {
   buildFrames,
-  currentPosition,
   isGameOver,
   isValidRoll,
+  nextRoll,
   pinsStanding,
   totalScore,
 } from '../domain/bowling.rules';
@@ -30,7 +30,7 @@ export const GameStore = signalStore(
       frames,
       totalScore: computed(() => totalScore(frames())),
       pinsStanding: computed(() => pinsStanding(frames())),
-      currentPosition: computed(() => currentPosition(frames())),
+      nextRoll: computed(() => nextRoll(frames())),
       isGameOver: computed(() => isGameOver(frames())),
     };
   }),

@@ -1,6 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { isPinCount } from '../../domain/bowling.rules';
-import { GameStore } from '../../store/game.store';
+import { GameStore } from '../../data-access/game.store';
 
 /**
  * Orchestration for the game page: builds labels from the store state and turns

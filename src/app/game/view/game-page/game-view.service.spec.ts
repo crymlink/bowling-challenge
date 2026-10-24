@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { GameStore } from '../../store/game.store';
+import { GameStore } from '../../data-access/game.store';
 import { GameViewService } from './game-view.service';
 
 /**

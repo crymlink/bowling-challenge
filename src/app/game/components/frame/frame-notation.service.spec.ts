@@ -25,7 +25,7 @@ function tenthFrame(...rolls: PinCount[]) {
 
 describe('score sheet notation', () => {
   it.each<{ name: string; rolls: PinCount[]; marks: (string | null)[] }>([
-    { name: 'a strike as X', rolls: [10], marks: ['X', null] },
+    { name: 'a strike as X in the right box', rolls: [10], marks: [null, 'X'] },
     { name: 'a spare as /', rolls: [7, 3], marks: ['7', '/'] },
     { name: 'a gutter ball as -', rolls: [0, 4], marks: ['-', '4'] },
     {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, input, output, viewChild } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 @Component({
   selector: 'app-game-controls',
@@ -11,11 +11,4 @@ export class GameControlsComponent {
 
   readonly undo = output<void>();
   readonly newGame = output<void>();
-
-  private readonly newGameButton =
-    viewChild.required<ElementRef<HTMLButtonElement>>('newGameButton');
-
-  focusNewGame(): void {
-    this.newGameButton().nativeElement.focus();
-  }
 }

@@ -7,15 +7,14 @@
       type="number"
       inputmode="numeric"
       [formField]="rollForm.pins"
-      [attr.aria-invalid]="errorMessage() ? 'true' : null"
-      [attr.aria-describedby]="errorMessage() ? 'pins-hint pins-error' : 'pins-hint'"
+      [class.invalid]="errorMessage()"
     />
     <button type="submit" class="primary" [disabled]="gameOver() || rollForm().invalid()">
       Roll
     </button>
     <button type="button" [disabled]="gameOver()" (click)="randomRoll.emit()">Random</button>
   </div>
-  <p id="pins-hint" class="hint">
+  <p class="hint">
     @if (gameOver()) {
       The game is over. Start a new game to keep playing.
     } @else {
@@ -23,6 +22,6 @@
     }
   </p>
   @if (errorMessage(); as message) {
-    <p id="pins-error" class="error">{{ message }}</p>
+    <p class="error">{{ message }}</p>
   }
 </form>

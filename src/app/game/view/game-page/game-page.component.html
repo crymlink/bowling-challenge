@@ -13,14 +13,14 @@
   <app-roll-input
     [maxPins]="game.maxPins()"
     [gameOver]="game.isGameOver()"
-    (roll)="roll($event)"
-    (randomRoll)="rollRandom()"
+    (roll)="game.roll($event)"
+    (randomRoll)="game.rollRandom()"
   />
 
   <app-game-controls
     [canUndo]="game.canUndo()"
     [gameOver]="game.isGameOver()"
-    (undo)="undo()"
+    (undo)="game.undo()"
     (newGame)="newGame()"
   />
 
@@ -29,6 +29,4 @@
     [currentFrame]="game.currentFrame()"
     [totalScore]="game.totalScore()"
   />
-
-  <p class="visually-hidden" aria-live="polite">{{ game.announcement() }}</p>
 </main>

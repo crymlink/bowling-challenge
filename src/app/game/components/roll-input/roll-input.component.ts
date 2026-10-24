@@ -71,7 +71,7 @@ export class RollInputComponent {
   }
 
   /** Focuses the input and selects its content so the next number replaces it. */
-  focus(): void {
+  private focus(): void {
     const element = this.pinsInput().nativeElement;
     element.focus();
     element.select();

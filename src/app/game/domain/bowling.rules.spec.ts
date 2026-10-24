@@ -1,10 +1,10 @@
 import { PinCount } from './bowling.models';
 import {
   buildFrames,
+  currentPosition,
   isGameOver,
   isPinCount,
   isValidRoll,
-  nextRoll,
   pinsStanding,
   totalScore,
 } from './bowling.rules';
@@ -23,7 +23,7 @@ function play(...rolls: PinCount[]) {
     runningTotals: frames.map((frame) => frame.runningTotal),
     rollsPerFrame: frames.map((frame) => frame.rolls),
     types: frames.map((frame) => frame.type),
-    position: nextRoll(frames),
+    position: currentPosition(frames),
     pinsStanding: pinsStanding(frames),
     isGameOver: isGameOver(frames),
     canRoll: (pins: PinCount) => isValidRoll(frames, pins),

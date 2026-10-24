@@ -39,7 +39,3 @@ export interface Rack {
 export interface RackRoll extends Rack {
   readonly pins: PinCount;
 }
-
-export interface GameState {
-  readonly rolls: readonly PinCount[];
-}

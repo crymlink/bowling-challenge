@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { RollPosition } from '../../domain/bowling.models';
+import { PinCount, RollPosition } from '../../domain/bowling.models';
 import { RollInputComponent } from './roll-input.component';
 
 /**
@@ -8,7 +8,7 @@ import { RollInputComponent } from './roll-input.component';
  */
 interface Inputs {
   position?: RollPosition | null;
-  pinsStanding?: number;
+  pinsStanding?: PinCount;
 }
 
 async function render({ position = { frame: 1, roll: 1 }, pinsStanding = 10 }: Inputs = {}) {
@@ -16,10 +16,8 @@ async function render({ position = { frame: 1, roll: 1 }, pinsStanding = 10 }: I
   fixture.componentRef.setInput('position', position);
   fixture.componentRef.setInput('pinsStanding', pinsStanding);
 
-  const rolled: number[] = [];
-  let randomRolls = 0;
+  const rolled: PinCount[] = [];
   fixture.componentInstance.roll.subscribe((pins) => rolled.push(pins));
-  fixture.componentInstance.randomRoll.subscribe(() => randomRolls++);
   await fixture.whenStable();
 
   const element: HTMLElement = fixture.nativeElement;
@@ -29,7 +27,6 @@ async function render({ position = { frame: 1, roll: 1 }, pinsStanding = 10 }: I
 
   return {
     rolled,
-    randomRolls: () => randomRolls,
     input,
     rollButton,
     randomButton,
@@ -99,12 +96,22 @@ describe('RollInputComponent', () => {
     });
   });
 
-  it('asks for a random roll', async () => {
-    const view = await render();
-    await view.click(view.randomButton);
+  describe('random roll', () => {
+    it('can knock down no pins', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const view = await render();
+      await view.click(view.randomButton);
 
-    expect(view.randomRolls()).toBe(1);
-    expect(view.rolled).toEqual([]);
+      expect(view.rolled).toEqual([0]);
+    });
+
+    it('can knock down all pins still standing, but never more', async () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.9999);
+      const view = await render({ pinsStanding: 3 });
+      await view.click(view.randomButton);
+
+      expect(view.rolled).toEqual([3]);
+    });
   });
 
   it('locks the input once the game is over', async () => {

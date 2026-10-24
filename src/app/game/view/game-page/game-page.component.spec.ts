@@ -4,7 +4,7 @@ import { GamePageComponent } from './game-page.component';
 const BUTTONS = {
   roll: 'app-roll-input button[type="submit"]',
   random: 'app-roll-input button[type="button"]',
-  newGame: 'app-game-controls button',
+  newGame: '.controls button',
 };
 
 /**
@@ -82,6 +82,7 @@ describe('GamePageComponent', () => {
       { marks: '2 4', total: '42' },
       { marks: '', total: '' },
     ]);
+    expect(page.status()).toBe('Frame 4 · Roll 1 · 10 pins standing');
     expect(page.currentFrame()).toBe(4);
     expect(page.totalScore()).toBe('Total score: 42');
   });

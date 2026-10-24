@@ -43,7 +43,7 @@ async function render() {
     click,
     /** Marks and running total per frame, e.g. "7 /" and "15". */
     frames: () =>
-      [...element.querySelectorAll('app-frame')].map((frame) => ({
+      [...element.querySelectorAll('.frame')].map((frame) => ({
         marks: [...frame.querySelectorAll('.mark')]
           .map((mark) => mark.textContent?.trim())
           .filter(Boolean)
@@ -51,7 +51,7 @@ async function render() {
         total: frame.querySelector('.running-total')?.textContent?.trim() ?? '',
       })),
     currentFrame: () =>
-      [...element.querySelectorAll('app-frame')].findIndex((frame) =>
+      [...element.querySelectorAll('.frame')].findIndex((frame) =>
         frame.classList.contains('current'),
       ) + 1,
     status: () => text('.status'),
@@ -85,6 +85,13 @@ describe('GamePageComponent', () => {
     expect(page.status()).toBe('Frame 4 · Roll 1 · 10 pins standing');
     expect(page.currentFrame()).toBe(4);
     expect(page.totalScore()).toBe('Total score: 42');
+  });
+
+  it('leaves the running total empty while a bonus is pending', async () => {
+    const page = await render();
+    await page.roll(7, 3);
+
+    expect(page.frames()[0]).toEqual({ marks: '7 /', total: '' });
   });
 
   it('plays a perfect game to the end', async () => {

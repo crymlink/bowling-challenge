@@ -1,10 +1,10 @@
 import { Component, input } from '@angular/core';
 import { Frame } from '../../domain/bowling.models';
-import { FrameComponent } from '../frame/frame.component';
+import { FrameMarksPipe } from './frame-marks.pipe';
 
 @Component({
   selector: 'app-score-sheet',
-  imports: [FrameComponent],
+  imports: [FrameMarksPipe],
   templateUrl: './score-sheet.component.html',
   styleUrl: './score-sheet.component.scss',
 })

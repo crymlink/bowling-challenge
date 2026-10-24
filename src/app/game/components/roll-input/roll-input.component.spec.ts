@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { PinCount, RollPosition } from '../../domain/bowling.models';
+import { RollPosition } from '../../domain/bowling.models';
 import { RollInputComponent } from './roll-input.component';
 
 /**
@@ -8,7 +8,7 @@ import { RollInputComponent } from './roll-input.component';
  */
 interface Inputs {
   position?: RollPosition | null;
-  pinsStanding?: PinCount;
+  pinsStanding?: number;
 }
 
 async function render({ position = { frame: 1, roll: 1 }, pinsStanding = 10 }: Inputs = {}) {
@@ -16,7 +16,7 @@ async function render({ position = { frame: 1, roll: 1 }, pinsStanding = 10 }: I
   fixture.componentRef.setInput('position', position);
   fixture.componentRef.setInput('pinsStanding', pinsStanding);
 
-  const rolled: PinCount[] = [];
+  const rolled: number[] = [];
   fixture.componentInstance.roll.subscribe((pins) => rolled.push(pins));
   await fixture.whenStable();
 

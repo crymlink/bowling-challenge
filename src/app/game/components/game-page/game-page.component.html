@@ -1,0 +1,30 @@
+<main class="game">
+  <h1>Bowling score</h1>
+
+  <p class="status">
+    <strong>{{ game.positionLabel() }}</strong>
+    @if (game.isGameOver()) {
+      — final score {{ game.totalScore() }}
+    } @else {
+      · {{ game.maxPins() }} pins standing
+    }
+  </p>
+
+  <app-roll-input
+    [maxPins]="game.maxPins()"
+    [gameOver]="game.isGameOver()"
+    (roll)="roll($event)"
+    (randomRoll)="rollRandom()"
+  />
+
+  <app-game-controls
+    [canUndo]="game.canUndo()"
+    [gameOver]="game.isGameOver()"
+    (undo)="undo()"
+    (newGame)="newGame()"
+  />
+
+  <app-score-sheet [frames]="game.frames()" [totalScore]="game.totalScore()" />
+
+  <p class="visually-hidden" aria-live="polite">{{ game.announcement() }}</p>
+</main>

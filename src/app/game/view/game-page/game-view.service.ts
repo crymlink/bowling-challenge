@@ -1,7 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
-import { isPinCount } from '../domain/bowling.rules';
-import { GameStore } from '../store/game.store';
-import { RANDOM } from './random.token';
+import { isPinCount } from '../../domain/bowling.rules';
+import { GameStore } from '../../store/game.store';
 
 /**
  * Orchestration for the game page: exposes the store state the screen needs,
@@ -11,7 +10,6 @@ import { RANDOM } from './random.token';
 @Injectable()
 export class GameViewService {
   private readonly store = inject(GameStore);
-  private readonly random = inject(RANDOM);
 
   readonly frames = this.store.frames;
   readonly totalScore = this.store.totalScore;
@@ -33,7 +31,7 @@ export class GameViewService {
   }
 
   rollRandom(): void {
-    this.roll(Math.floor(this.random() * (this.maxPins() + 1)));
+    this.roll(Math.floor(Math.random() * (this.maxPins() + 1)));
   }
 
   undo(): void {

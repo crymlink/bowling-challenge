@@ -1,5 +1,5 @@
 import { Component, inject, viewChild } from '@angular/core';
-import { GameViewService } from '../game-view.service';
+import { GameViewService } from './game-view.service';
 import { GameControlsComponent } from '../../components/game-controls/game-controls.component';
 import { RollInputComponent } from '../../components/roll-input/roll-input.component';
 import { ScoreSheetComponent } from '../../components/score-sheet/score-sheet.component';

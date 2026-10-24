@@ -3,7 +3,7 @@
   <ol class="frames">
     @for (frame of frames(); track frame.number) {
       <li>
-        <app-frame [frame]="frame" [current]="frame.number === currentFrame()" />
+        <app-frame [frame]="frame" [class.current]="frame.number === currentFrame()" />
       </li>
     }
   </ol>

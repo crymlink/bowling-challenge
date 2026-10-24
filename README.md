@@ -48,11 +48,12 @@ sich widersprüchlich werden, und Erweiterungen wie Speichern oder Rückgängig 
 dieses eine Array.
 
 **Die Regeln sind frameworkfrei.** `domain/bowling.rules.ts` besteht aus reinen Funktionen ohne
-Abhängigkeit zu Angular. Kern ist eine einzige Bewertungsregel für alle Frames: Ein Frame zählt eine
-Folge von Würfen ab seinem ersten Wurf, bei Strike und Spare drei, bei einem offenen Frame zwei. Das
-gilt auch für den 10. Frame, dessen Bonuswürfe einfach innerhalb des Frames gespielt werden. Ein
-Sonderfall für den 10. Frame wird so nur noch beim Aufteilen der Würfe und beim Aufstellen neuer
-Pins benötigt.
+Abhängigkeit zu Angular. Die Berechnung folgt direkt der Aufgabenbeschreibung: Strike = 10 + die
+nächsten zwei Würfe, Spare = 10 + der nächste Wurf, offener Frame = Pins beider Würfe. Im 10. Frame
+sind die nächsten Würfe einfach seine eigenen Bonuswürfe, daher braucht die Berechnung dafür keinen
+Sonderfall. Ein Sonderfall für den 10. Frame wird nur beim Aufteilen der Würfe und beim Aufstellen
+neuer Pins benötigt. Die Anzahl der Würfe und Bonuswürfe ist als benannte Konstante hinterlegt,
+nicht als Zahl im Code.
 
 **Validierung auf zwei Ebenen.** Das Formular (Signal Forms) prüft die Eingabe für den Nutzer und
 zeigt Fehlermeldungen an. Der Store prüft jeden Wurf zusätzlich gegen die Regeln, damit auch andere

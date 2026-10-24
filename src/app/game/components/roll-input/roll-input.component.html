@@ -18,7 +18,7 @@
     @if (gameOver()) {
       The game is over. Start a new game to keep playing.
     } @else {
-      Enter a number from 0 to {{ maxPins() }}.
+      Enter a number from 0 to {{ pinsStanding() }}.
     }
   </p>
   @if (errorMessage(); as message) {

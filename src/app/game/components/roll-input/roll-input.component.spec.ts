@@ -1,14 +1,20 @@
 import { TestBed } from '@angular/core/testing';
+import { RollPosition } from '../../domain/bowling.models';
 import { RollInputComponent } from './roll-input.component';
 
 /**
  * These tests use the roll input the way a player does: typing, clicking and reading.
  * `render()` is the only place that knows the component's inputs, outputs and markup.
  */
-async function render({ maxPins = 10, gameOver = false } = {}) {
+interface Inputs {
+  position?: RollPosition | null;
+  pinsStanding?: number;
+}
+
+async function render({ position = { frame: 1, roll: 1 }, pinsStanding = 10 }: Inputs = {}) {
   const fixture = TestBed.createComponent(RollInputComponent);
-  fixture.componentRef.setInput('maxPins', maxPins);
-  fixture.componentRef.setInput('gameOver', gameOver);
+  fixture.componentRef.setInput('position', position);
+  fixture.componentRef.setInput('pinsStanding', pinsStanding);
 
   const rolled: number[] = [];
   let randomRolls = 0;
@@ -36,12 +42,8 @@ async function render({ maxPins = 10, gameOver = false } = {}) {
       button.click();
       await fixture.whenStable();
     },
-    async update(inputs: { maxPins?: number; gameOver?: boolean }) {
+    async update(inputs: Inputs) {
       Object.entries(inputs).forEach(([name, value]) => fixture.componentRef.setInput(name, value));
-      await fixture.whenStable();
-    },
-    async clear() {
-      fixture.componentInstance.clear();
       await fixture.whenStable();
     },
     hint: () => element.querySelector('.hint')?.textContent?.trim(),
@@ -61,7 +63,7 @@ describe('RollInputComponent', () => {
   });
 
   it('tells the player how many pins can be knocked down', async () => {
-    const view = await render({ maxPins: 3 });
+    const view = await render({ pinsStanding: 3 });
 
     expect(view.hint()).toBe('Enter a number from 0 to 3.');
   });
@@ -79,7 +81,7 @@ describe('RollInputComponent', () => {
       { name: 'a decimal number', value: '2.5', message: 'Enter a whole number.' },
       { name: 'an empty field', value: '', message: 'Enter the number of pins.' },
     ])('rejects $name', async ({ value, message }) => {
-      const view = await render({ maxPins: 3 });
+      const view = await render({ pinsStanding: 3 });
       await view.type(value);
 
       expect(view.error()).toBe(message);
@@ -87,11 +89,11 @@ describe('RollInputComponent', () => {
     });
 
     it('follows the pins still standing', async () => {
-      const view = await render({ maxPins: 10 });
+      const view = await render({ pinsStanding: 10 });
       await view.type('8');
       expect(view.error()).toBe('');
 
-      await view.update({ maxPins: 3 });
+      await view.update({ pinsStanding: 3 });
 
       expect(view.error()).toBe('Only 3 pins are standing.');
     });
@@ -106,7 +108,7 @@ describe('RollInputComponent', () => {
   });
 
   it('locks the input once the game is over', async () => {
-    const view = await render({ gameOver: true });
+    const view = await render({ position: null });
 
     expect(view.input.disabled).toBe(true);
     expect(view.rollButton.disabled).toBe(true);
@@ -114,10 +116,10 @@ describe('RollInputComponent', () => {
     expect(view.hint()).toBe('The game is over. Start a new game to keep playing.');
   });
 
-  it('can be cleared from outside', async () => {
-    const view = await render({ maxPins: 3 });
+  it('starts over when the game moves on to another roll', async () => {
+    const view = await render({ pinsStanding: 3 });
     await view.type('8');
-    await view.clear();
+    await view.update({ position: { frame: 1, roll: 2 } });
 
     expect(view.input.value).toBe('0');
     expect(view.error()).toBe('');

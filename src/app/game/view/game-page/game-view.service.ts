@@ -15,7 +15,6 @@ export class GameViewService {
   readonly totalScore = this.store.totalScore;
   readonly maxPins = this.store.pinsStanding;
   readonly isGameOver = this.store.isGameOver;
-  readonly canUndo = this.store.canUndo;
 
   readonly currentFrame = computed(() => this.store.currentPosition()?.frame ?? null);
 
@@ -32,10 +31,6 @@ export class GameViewService {
 
   rollRandom(): void {
     this.roll(Math.floor(Math.random() * (this.maxPins() + 1)));
-  }
-
-  undo(): void {
-    this.store.undo();
   }
 
   newGame(): void {

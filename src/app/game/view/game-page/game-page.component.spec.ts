@@ -4,8 +4,7 @@ import { GamePageComponent } from './game-page.component';
 const BUTTONS = {
   roll: 'app-roll-input button[type="submit"]',
   random: 'app-roll-input button[type="button"]',
-  undo: 'app-game-controls button:first-child',
-  newGame: 'app-game-controls button:last-child',
+  newGame: 'app-game-controls button',
 };
 
 /**
@@ -71,7 +70,6 @@ describe('GamePageComponent', () => {
     expect(page.frames()).toHaveLength(10);
     expect(page.currentFrame()).toBe(1);
     expect(page.totalScore()).toBe('Total score: 0');
-    expect(page.isDisabled('undo')).toBe(true);
   });
 
   it('writes rolls and scores onto the score sheet', async () => {
@@ -110,15 +108,6 @@ describe('GamePageComponent', () => {
 
     expect(page.status()).toBe('Game over — final score 80');
     expect(page.frames()[9]).toEqual({ marks: '5 3', total: '80' });
-  });
-
-  it('undoes the last roll', async () => {
-    const page = await render();
-    await page.roll(7, 2);
-    await page.click('undo');
-
-    expect(page.frames()[0]).toEqual({ marks: '7', total: '' });
-    expect(page.status()).toBe('Frame 1 · Roll 2 · 3 pins standing');
   });
 
   it('starts a new game and clears the input', async () => {

@@ -27,7 +27,6 @@ describe('GameStore', () => {
     expect(store.currentPosition()).toEqual({ frame: 1, roll: 1 });
     expect(store.pinsStanding()).toBe(10);
     expect(store.isGameOver()).toBe(false);
-    expect(store.canUndo()).toBe(false);
   });
 
   it('records valid rolls and derives the game state from them', () => {
@@ -38,39 +37,12 @@ describe('GameStore', () => {
     expect(store.totalScore()).toBe(15);
     expect(store.currentPosition()).toEqual({ frame: 2, roll: 2 });
     expect(store.pinsStanding()).toBe(5);
-    expect(store.canUndo()).toBe(true);
   });
 
   it('ignores rolls the rules do not allow', () => {
     const store = game(7, 4);
 
     expect(store.rolls()).toEqual([7]);
-  });
-
-  describe('undo', () => {
-    it('removes only the last roll', () => {
-      const store = game(7, 3, 5);
-      store.undo();
-
-      expect(store.rolls()).toEqual([7, 3]);
-      expect(store.frames()[0]?.score).toBeNull();
-    });
-
-    it('reopens a finished game', () => {
-      const store = game(...repeat(20, 0));
-      store.undo();
-
-      expect(store.isGameOver()).toBe(false);
-      expect(store.currentPosition()).toEqual({ frame: 10, roll: 2 });
-    });
-
-    it('does nothing on an empty game', () => {
-      const store = game();
-      store.undo();
-
-      expect(store.rolls()).toEqual([]);
-      expect(store.canUndo()).toBe(false);
-    });
   });
 
   it('starts a fresh game on reset', () => {

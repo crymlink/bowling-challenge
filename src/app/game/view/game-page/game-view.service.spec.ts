@@ -3,8 +3,8 @@ import { GameViewService } from './game-view.service';
 
 /**
  * These tests describe what the view service adds on top of the store: filtering raw input,
- * random rolls and labels. Undo and new game are plain delegation and are covered by the
- * game page tests. `game()` is the only place that knows how the service is provided and fed.
+ * random rolls and labels. New game is plain delegation and is covered by the game page tests.
+ * `game()` is the only place that knows how the service is provided and fed.
  */
 function game(...rolls: number[]) {
   TestBed.configureTestingModule({ providers: [GameViewService] });

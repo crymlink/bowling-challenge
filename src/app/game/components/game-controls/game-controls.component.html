@@ -1,4 +1,3 @@
 <div class="controls">
-  <button type="button" [disabled]="!canUndo()" (click)="undo.emit()">Undo last roll</button>
   <button type="button" [class.primary]="gameOver()" (click)="newGame.emit()">New game</button>
 </div>

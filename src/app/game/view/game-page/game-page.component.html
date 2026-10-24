@@ -17,12 +17,7 @@
     (randomRoll)="game.rollRandom()"
   />
 
-  <app-game-controls
-    [canUndo]="game.canUndo()"
-    [gameOver]="game.isGameOver()"
-    (undo)="game.undo()"
-    (newGame)="newGame()"
-  />
+  <app-game-controls [gameOver]="game.isGameOver()" (newGame)="newGame()" />
 
   <app-score-sheet
     [frames]="game.frames()"

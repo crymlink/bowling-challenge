@@ -28,7 +28,6 @@ export const GameStore = signalStore(
       pinsStanding: computed(() => pinsStanding(frames())),
       currentPosition: computed(() => currentPosition(frames())),
       isGameOver: computed(() => isGameOver(frames())),
-      canUndo: computed(() => rolls().length > 0),
     };
   }),
   withMethods((store) => ({
@@ -38,9 +37,6 @@ export const GameStore = signalStore(
         return;
       }
       patchState(store, { rolls: [...store.rolls(), pins] });
-    },
-    undo(): void {
-      patchState(store, { rolls: store.rolls().slice(0, -1) });
     },
     reset(): void {
       patchState(store, initialState);

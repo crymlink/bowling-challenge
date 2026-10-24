@@ -37,17 +37,33 @@ function repeat(times: number, ...rolls: PinCount[]): PinCount[] {
 
 describe('bowling rules', () => {
   describe('scoring complete games', () => {
-    it.each<[string, number, PinCount[]]>([
-      ['gutter game', 0, repeat(20, 0)],
-      ['all ones', 20, repeat(20, 1)],
-      ['all nine-miss', 90, repeat(10, 9, 0)],
-      ['all spares with 5 pins', 150, repeat(21, 5)],
-      ['perfect game', 300, repeat(12, 10)],
-      ['strike with 9-0 in the tenth frame', 19, [...repeat(18, 0), 10, 9, 0]],
-      ['three strikes in the tenth frame', 30, [...repeat(18, 0), 10, 10, 10]],
-      ['spare and strike in the tenth frame', 20, [...repeat(18, 0), 7, 3, 10]],
-      ['open tenth frame after nine strikes', 257, [...repeat(9, 10), 3, 4]],
-    ])('%s scores %i', (_name, expected, rolls) => {
+    it.each<{ name: string; expected: number; rolls: PinCount[] }>([
+      { name: 'gutter game', expected: 0, rolls: repeat(20, 0) },
+      { name: 'all ones', expected: 20, rolls: repeat(20, 1) },
+      { name: 'all nine-miss', expected: 90, rolls: repeat(10, 9, 0) },
+      { name: 'all spares with 5 pins', expected: 150, rolls: repeat(21, 5) },
+      { name: 'perfect game', expected: 300, rolls: repeat(12, 10) },
+      {
+        name: 'strike with 9-0 in the tenth frame',
+        expected: 19,
+        rolls: [...repeat(18, 0), 10, 9, 0],
+      },
+      {
+        name: 'three strikes in the tenth frame',
+        expected: 30,
+        rolls: [...repeat(18, 0), 10, 10, 10],
+      },
+      {
+        name: 'spare and strike in the tenth frame',
+        expected: 20,
+        rolls: [...repeat(18, 0), 7, 3, 10],
+      },
+      {
+        name: 'open tenth frame after nine strikes',
+        expected: 257,
+        rolls: [...repeat(9, 10), 3, 4],
+      },
+    ])('$name scores $expected', ({ expected, rolls }) => {
       const game = play(...rolls);
 
       expect(game.total).toBe(expected);
@@ -192,12 +208,12 @@ describe('bowling rules', () => {
       expect(game.canRoll(4)).toBe(false);
     });
 
-    it.each<[string, PinCount[], PinCount]>([
-      ['a strike', [10], 10],
-      ['a strike and 3 pins', [10, 3], 7],
-      ['two strikes', [10, 10], 10],
-      ['a spare', [7, 3], 10],
-    ])('in the tenth frame the pins are reset after %s', (_name, tenthFrame, standing) => {
+    it.each<{ name: string; tenthFrame: PinCount[]; standing: PinCount }>([
+      { name: 'a strike', tenthFrame: [10], standing: 10 },
+      { name: 'a strike and 3 pins', tenthFrame: [10, 3], standing: 7 },
+      { name: 'two strikes', tenthFrame: [10, 10], standing: 10 },
+      { name: 'a spare', tenthFrame: [7, 3], standing: 10 },
+    ])('in the tenth frame the pins are reset after $name', ({ tenthFrame, standing }) => {
       const game = play(...repeat(18, 0), ...tenthFrame);
 
       expect(game.pinsStanding).toBe(standing);

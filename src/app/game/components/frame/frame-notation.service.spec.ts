@@ -24,25 +24,29 @@ function tenthFrame(...rolls: PinCount[]) {
 }
 
 describe('score sheet notation', () => {
-  it.each<[string, PinCount[], (string | null)[]]>([
-    ['a strike as X', [10], ['X', null]],
-    ['a spare as /', [7, 3], ['7', '/']],
-    ['a gutter ball as -', [0, 4], ['-', '4']],
-    ['knocking down all 10 pins with the second ball as a spare', [0, 10], ['-', '/']],
-    ['an open frame as the pins of each roll', [3, 4], ['3', '4']],
-    ['a frame after one roll with an empty second box', [5], ['5', null]],
-    ['an unplayed frame with empty boxes', [], [null, null]],
-  ])('shows %s', (_name, rolls, expected) => {
-    expect(sheet(...rolls)[0]).toEqual(expected);
+  it.each<{ name: string; rolls: PinCount[]; marks: (string | null)[] }>([
+    { name: 'a strike as X', rolls: [10], marks: ['X', null] },
+    { name: 'a spare as /', rolls: [7, 3], marks: ['7', '/'] },
+    { name: 'a gutter ball as -', rolls: [0, 4], marks: ['-', '4'] },
+    {
+      name: 'knocking down all 10 pins with the second ball as a spare',
+      rolls: [0, 10],
+      marks: ['-', '/'],
+    },
+    { name: 'an open frame as the pins of each roll', rolls: [3, 4], marks: ['3', '4'] },
+    { name: 'a frame after one roll with an empty second box', rolls: [5], marks: ['5', null] },
+    { name: 'an unplayed frame with empty boxes', rolls: [], marks: [null, null] },
+  ])('shows $name', ({ rolls, marks }) => {
+    expect(sheet(...rolls)[0]).toEqual(marks);
   });
 
-  it.each<[string, PinCount[], (string | null)[]]>([
-    ['three strikes', [10, 10, 10], ['X', 'X', 'X']],
-    ['a strike followed by a spare', [10, 3, 7], ['X', '3', '/']],
-    ['a spare followed by a strike', [7, 3, 10], ['7', '/', 'X']],
-    ['a strike, a gutter ball and a spare', [10, 0, 10], ['X', '-', '/']],
-    ['an open frame without a third roll', [3, 4], ['3', '4', null]],
-  ])('shows %s in the tenth frame', (_name, rolls, expected) => {
-    expect(tenthFrame(...rolls)).toEqual(expected);
+  it.each<{ name: string; rolls: PinCount[]; marks: (string | null)[] }>([
+    { name: 'three strikes', rolls: [10, 10, 10], marks: ['X', 'X', 'X'] },
+    { name: 'a strike followed by a spare', rolls: [10, 3, 7], marks: ['X', '3', '/'] },
+    { name: 'a spare followed by a strike', rolls: [7, 3, 10], marks: ['7', '/', 'X'] },
+    { name: 'a strike, a gutter ball and a spare', rolls: [10, 0, 10], marks: ['X', '-', '/'] },
+    { name: 'an open frame without a third roll', rolls: [3, 4], marks: ['3', '4', null] },
+  ])('shows $name in the tenth frame', ({ rolls, marks }) => {
+    expect(tenthFrame(...rolls)).toEqual(marks);
   });
 });

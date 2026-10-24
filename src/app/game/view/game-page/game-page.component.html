@@ -3,25 +3,25 @@
 
   <p class="status">
     <strong>{{ game.positionLabel() }}</strong>
-    @if (game.isGameOver()) {
-      — final score {{ game.totalScore() }}
+    @if (store.isGameOver()) {
+      — final score {{ store.totalScore() }}
     } @else {
-      · {{ game.maxPins() }} pins standing
+      · {{ store.pinsStanding() }} pins standing
     }
   </p>
 
   <app-roll-input
-    [maxPins]="game.maxPins()"
-    [gameOver]="game.isGameOver()"
+    [maxPins]="store.pinsStanding()"
+    [gameOver]="store.isGameOver()"
     (roll)="game.roll($event)"
     (randomRoll)="game.rollRandom()"
   />
 
-  <app-game-controls [gameOver]="game.isGameOver()" (newGame)="newGame()" />
+  <app-game-controls [gameOver]="store.isGameOver()" (newGame)="newGame()" />
 
   <app-score-sheet
-    [frames]="game.frames()"
+    [frames]="store.frames()"
     [currentFrame]="game.currentFrame()"
-    [totalScore]="game.totalScore()"
+    [totalScore]="store.totalScore()"
   />
 </div>

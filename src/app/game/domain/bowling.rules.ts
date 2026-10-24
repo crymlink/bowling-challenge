@@ -7,7 +7,17 @@ import { Frame, FrameType, PinCount, RollPosition } from './bowling.models';
 
 export const FRAME_COUNT = 10;
 export const MAX_PINS = 10;
-const LAST_FRAME_MAX_ROLLS = 3;
+
+/**
+ * Number of consecutive rolls, starting at a frame's first roll, that make up its score.
+ * Strike: 10 + next two rolls. Spare: both rolls + next roll. Open: both rolls.
+ * This holds for frame 10 as well; its bonus rolls are simply played inside the frame.
+ */
+const SCORED_ROLLS: Record<Exclude<FrameType, 'incomplete'>, number> = {
+  strike: 3,
+  spare: 3,
+  open: 2,
+};
 
 export function isPinCount(value: number): value is PinCount {
   return Number.isInteger(value) && value >= 0 && value <= MAX_PINS;
@@ -16,22 +26,18 @@ export function isPinCount(value: number): value is PinCount {
 /** Splits the rolls into all 10 frames, including scores and running totals. */
 export function buildFrames(rolls: readonly PinCount[]): Frame[] {
   const frames: Frame[] = [];
-  let rollIndex = 0;
+  let start = 0;
   let runningTotal: number | null = 0;
 
   for (let number = 1; number <= FRAME_COUNT; number++) {
-    const isLastFrame = number === FRAME_COUNT;
-    const frameRolls = isLastFrame
-      ? rolls.slice(rollIndex, rollIndex + LAST_FRAME_MAX_ROLLS)
-      : regularFrameRolls(rolls, rollIndex);
+    // Frame 10 keeps all remaining rolls, including its bonus rolls.
+    const frameRolls = number === FRAME_COUNT ? rolls.slice(start) : rollsOfFrame(rolls, start);
     const type = frameType(frameRolls);
-    const score = isLastFrame
-      ? lastFrameScore(frameRolls)
-      : regularFrameScore(rolls, rollIndex, frameRolls, type);
+    const score = frameScore(rolls, start, type);
 
-    runningTotal = runningTotal !== null && score !== null ? runningTotal + score : null;
+    runningTotal = runningTotal === null || score === null ? null : runningTotal + score;
     frames.push({ number, rolls: frameRolls, type, score, runningTotal });
-    rollIndex += frameRolls.length;
+    start += frameRolls.length;
   }
 
   return frames;
@@ -42,50 +48,36 @@ export function totalScore(frames: readonly Frame[]): number {
   return frames.reduce((total, frame) => frame.runningTotal ?? total, 0);
 }
 
-/** Position of the next roll, or `null` when the game is over. */
-export function currentPosition(frames: readonly Frame[]): RollPosition | null {
-  const frame = frames.find((candidate) => !isFrameFinished(candidate));
-  return frame ? { frame: frame.number, roll: frame.rolls.length + 1 } : null;
+/** The game is over as soon as frame 10 has a score. */
+export function isGameOver(frames: readonly Frame[]): boolean {
+  const lastFrame = frames[FRAME_COUNT - 1];
+  return lastFrame !== undefined && lastFrame.score !== null;
 }
 
-export function isGameOver(frames: readonly Frame[]): boolean {
-  return currentPosition(frames) === null;
+/** Position of the next roll, or `null` when the game is over. */
+export function currentPosition(frames: readonly Frame[]): RollPosition | null {
+  const frame = currentFrame(frames);
+  return frame ? { frame: frame.number, roll: frame.rolls.length + 1 } : null;
 }
 
 /** Maximum number of pins the next roll can knock down; 0 when the game is over. */
 export function pinsStanding(frames: readonly Frame[]): PinCount {
-  const position = currentPosition(frames);
-  const frame = position ? frames[position.frame - 1] : undefined;
+  const frame = currentFrame(frames);
   if (!frame) {
     return 0;
   }
-
-  // In frame 10 the pins are reset after a strike or spare, so track the rack roll by roll.
-  let standing = MAX_PINS;
-  for (const pins of frame.rolls) {
-    standing -= pins;
-    if (standing === 0) {
-      standing = MAX_PINS;
-    }
-  }
-  return toPinCount(standing);
+  // Knocking down all pins resets the rack; mid-frame that only happens in frame 10.
+  return toPinCount(MAX_PINS - (sum(frame.rolls) % MAX_PINS));
 }
 
-export function isValidRoll(rolls: readonly PinCount[], pins: PinCount): boolean {
-  const frames = buildFrames(rolls);
+export function isValidRoll(frames: readonly Frame[], pins: PinCount): boolean {
   return !isGameOver(frames) && pins <= pinsStanding(frames);
 }
 
-function regularFrameRolls(rolls: readonly PinCount[], start: number): PinCount[] {
-  const first = rolls[start];
-  if (first === undefined) {
-    return [];
-  }
-  if (first === MAX_PINS) {
-    return [first];
-  }
-  const second = rolls[start + 1];
-  return second === undefined ? [first] : [first, second];
+/** Frames 1–9 end after a strike or after two rolls. */
+function rollsOfFrame(rolls: readonly PinCount[], start: number): PinCount[] {
+  const length = rolls[start] === MAX_PINS ? 1 : 2;
+  return rolls.slice(start, start + length);
 }
 
 function frameType(frameRolls: readonly PinCount[]): FrameType {
@@ -99,48 +91,23 @@ function frameType(frameRolls: readonly PinCount[]): FrameType {
   return first + second === MAX_PINS ? 'spare' : 'open';
 }
 
-function regularFrameScore(
-  rolls: readonly PinCount[],
-  start: number,
-  frameRolls: readonly PinCount[],
-  type: FrameType,
-): number | null {
-  switch (type) {
-    case 'strike':
-      return bonusScore(rolls, start + 1, 2);
-    case 'spare':
-      return bonusScore(rolls, start + 2, 1);
-    case 'open':
-      return sum(frameRolls);
-    case 'incomplete':
-      return null;
+/** `null` while the frame or its bonus rolls are still pending. */
+function frameScore(rolls: readonly PinCount[], start: number, type: FrameType): number | null {
+  if (type === 'incomplete') {
+    return null;
   }
+  const scoredRolls = rolls.slice(start, start + SCORED_ROLLS[type]);
+  return scoredRolls.length === SCORED_ROLLS[type] ? sum(scoredRolls) : null;
 }
 
-/** All 10 pins plus the next `count` rolls, or `null` if those rolls haven't happened yet. */
-function bonusScore(rolls: readonly PinCount[], start: number, count: number): number | null {
-  const bonusRolls = rolls.slice(start, start + count);
-  return bonusRolls.length === count ? MAX_PINS + sum(bonusRolls) : null;
+/** The frame the next roll belongs to, or `undefined` when the game is over. */
+function currentFrame(frames: readonly Frame[]): Frame | undefined {
+  return frames.find((frame) => !isFrameFinished(frame));
 }
 
-/** Frame 10 has no bonus: its score is simply the sum of its rolls once it is finished. */
-function lastFrameScore(frameRolls: readonly PinCount[]): number | null {
-  return isLastFrameFinished(frameRolls) ? sum(frameRolls) : null;
-}
-
+/** Frames 1–9 are finished once classified; frame 10 once its score is known. */
 function isFrameFinished(frame: Frame): boolean {
-  if (frame.number === FRAME_COUNT) {
-    return isLastFrameFinished(frame.rolls);
-  }
-  return frame.type !== 'incomplete';
-}
-
-/** Frame 10 ends after two rolls without strike/spare, otherwise after the third roll. */
-function isLastFrameFinished(frameRolls: readonly PinCount[]): boolean {
-  if (frameRolls.length === LAST_FRAME_MAX_ROLLS) {
-    return true;
-  }
-  return frameRolls.length === 2 && sum(frameRolls) < MAX_PINS;
+  return frame.number === FRAME_COUNT ? frame.score !== null : frame.type !== 'incomplete';
 }
 
 function sum(pins: readonly PinCount[]): number {

@@ -26,7 +26,7 @@ function play(...rolls: PinCount[]) {
     position: currentPosition(frames),
     pinsStanding: pinsStanding(frames),
     isGameOver: isGameOver(frames),
-    canRoll: (pins: PinCount) => isValidRoll(rolls, pins),
+    canRoll: (pins: PinCount) => isValidRoll(frames, pins),
   };
 }
 

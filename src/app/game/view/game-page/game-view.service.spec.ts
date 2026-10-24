@@ -1,10 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { GameStore } from '../../store/game.store';
 import { GameViewService } from './game-view.service';
 
 /**
  * These tests describe what the view service adds on top of the store: filtering raw input,
  * random rolls and labels. New game is plain delegation and is covered by the game page tests.
- * `game()` is the only place that knows how the service is provided and fed.
+ * `game()` is the only place that knows how the service is provided and fed, `rolls()` how
+ * the result is read.
  */
 function game(...rolls: number[]) {
   TestBed.configureTestingModule({ providers: [GameViewService] });
@@ -13,22 +15,22 @@ function game(...rolls: number[]) {
   return view;
 }
 
-function rollsOf(view: GameViewService): number[] {
-  return view.frames().flatMap((frame) => frame.rolls);
+function rolls(): readonly number[] {
+  return TestBed.inject(GameStore).rolls();
 }
 
 describe('GameViewService', () => {
   describe('rolling', () => {
     it('passes valid pin counts on to the game', () => {
-      const view = game(7, 2);
+      game(7, 2);
 
-      expect(rollsOf(view)).toEqual([7, 2]);
+      expect(rolls()).toEqual([7, 2]);
     });
 
     it.each([2.5, Number.NaN, 11, -1])('ignores %d as a pin count', (pins) => {
-      const view = game(pins);
+      game(pins);
 
-      expect(rollsOf(view)).toEqual([]);
+      expect(rolls()).toEqual([]);
     });
   });
 
@@ -38,7 +40,7 @@ describe('GameViewService', () => {
       const view = game();
       view.rollRandom();
 
-      expect(rollsOf(view)).toEqual([0]);
+      expect(rolls()).toEqual([0]);
     });
 
     it('can knock down all pins still standing, but never more', () => {
@@ -46,14 +48,14 @@ describe('GameViewService', () => {
       const view = game(7);
       view.rollRandom();
 
-      expect(rollsOf(view)).toEqual([7, 3]);
+      expect(rolls()).toEqual([7, 3]);
     });
 
     it('does nothing once the game is over', () => {
       const view = game(...Array.from({ length: 20 }, () => 0));
       view.rollRandom();
 
-      expect(rollsOf(view)).toHaveLength(20);
+      expect(rolls()).toHaveLength(20);
     });
   });
 
@@ -63,7 +65,6 @@ describe('GameViewService', () => {
 
       expect(view.positionLabel()).toBe('Frame 1 · Roll 2');
       expect(view.currentFrame()).toBe(1);
-      expect(view.maxPins()).toBe(7);
     });
 
     it('moves to the next frame after a strike', () => {

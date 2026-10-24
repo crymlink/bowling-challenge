@@ -52,10 +52,9 @@ export function totalScore(frames: readonly Frame[]): number {
   return frames.reduce((total, frame) => frame.runningTotal ?? total, 0);
 }
 
-/** The game is over as soon as frame 10 has a score. */
+/** The game is over once every frame, including frame 10 and its bonus rolls, is finished. */
 export function isGameOver(frames: readonly Frame[]): boolean {
-  const lastFrame = frames[FRAME_COUNT - 1];
-  return lastFrame !== undefined && lastFrame.score !== null;
+  return currentFrame(frames) === undefined;
 }
 
 /** Position of the next roll, or `null` when the game is over. */

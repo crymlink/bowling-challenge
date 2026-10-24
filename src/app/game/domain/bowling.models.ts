@@ -27,13 +27,17 @@ export interface RollPosition {
   readonly roll: number;
 }
 
-/** A roll together with the rack it was thrown at. */
-export interface RackRoll {
-  readonly pins: PinCount;
+/** The pins on the lane before a roll. */
+export interface Rack {
   /** Pins standing before the roll. */
   readonly standing: PinCount;
-  /** Whether the roll was the first ball at a fresh rack. */
+  /** Whether the roll is the first ball at a fresh rack. */
   readonly isFirstBall: boolean;
+}
+
+/** A roll together with the rack it was thrown at. */
+export interface RackRoll extends Rack {
+  readonly pins: PinCount;
 }
 
 export interface GameState {

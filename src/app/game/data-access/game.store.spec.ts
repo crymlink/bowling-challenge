@@ -24,7 +24,7 @@ describe('GameStore', () => {
 
     expect(store.rolls()).toEqual([]);
     expect(store.totalScore()).toBe(0);
-    expect(store.nextRoll()).toEqual({ frame: 1, roll: 1 });
+    expect(store.currentPosition()).toEqual({ frame: 1, roll: 1 });
     expect(store.pinsStanding()).toBe(10);
     expect(store.isGameOver()).toBe(false);
   });
@@ -35,7 +35,7 @@ describe('GameStore', () => {
     expect(store.rolls()).toEqual([7, 3, 5]);
     expect(store.frames()[0]?.score).toBe(15);
     expect(store.totalScore()).toBe(15);
-    expect(store.nextRoll()).toEqual({ frame: 2, roll: 2 });
+    expect(store.currentPosition()).toEqual({ frame: 2, roll: 2 });
     expect(store.pinsStanding()).toBe(5);
   });
 

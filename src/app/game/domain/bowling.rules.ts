@@ -7,7 +7,7 @@ import { Frame, FrameType, PinCount, Rack, RackRoll, RollPosition } from './bowl
  * How the pieces fit together:
  *
  *   rolls ──buildFrames──▶ frames ──┬─▶ totalScore        (score shown under the sheet)
- *                                   ├─▶ nextRoll          (which frame/roll is next)
+ *                                   ├─▶ currentPosition   (which frame/roll is next)
  *                                   ├─▶ pinsStanding      (max pins for the next roll)
  *                                   ├─▶ isGameOver
  *                                   └─▶ isValidRoll       (guards every new roll)
@@ -82,8 +82,8 @@ export function isGameOver(frames: readonly Frame[]): boolean {
   return currentFrame(frames) === undefined;
 }
 
-/** Position of the next roll, or `null` when the game is over. */
-export function nextRoll(frames: readonly Frame[]): RollPosition | null {
+/** Current position of the cursor: the frame and roll of the next roll, or `null` when the game is over. */
+export function currentPosition(frames: readonly Frame[]): RollPosition | null {
   const frame = currentFrame(frames);
   return frame ? { frame: frame.number, roll: frame.rolls.length + 1 } : null;
 }

@@ -2,7 +2,7 @@
   <h1>Bowling score</h1>
 
   <p class="status">
-    @if (store.nextRoll(); as position) {
+    @if (store.currentPosition(); as position) {
       <strong>Frame {{ position.frame }} · Roll {{ position.roll }}</strong>
       · {{ store.pinsStanding() }} pins standing
     } @else {
@@ -11,7 +11,7 @@
   </p>
 
   <app-roll-input
-    [position]="store.nextRoll()"
+    [position]="store.currentPosition()"
     [pinsStanding]="store.pinsStanding()"
     (roll)="store.roll($event)"
   />
@@ -24,7 +24,7 @@
 
   <app-score-sheet
     [frames]="store.frames()"
-    [currentFrame]="store.nextRoll()?.frame ?? null"
+    [currentFrame]="store.currentPosition()?.frame ?? null"
     [totalScore]="store.totalScore()"
   />
 </div>

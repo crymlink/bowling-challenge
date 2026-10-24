@@ -1,28 +1,43 @@
-import { Frame, FrameType, PinCount, RackRoll, RollPosition } from './bowling.models';
+import { Frame, FrameType, PinCount, Rack, RackRoll, RollPosition } from './bowling.models';
 
 /**
  * Pure bowling scoring rules. Framework-free on purpose: everything is derived
  * from the list of rolls, so the same logic could validate a game on a backend.
+ *
+ * How the pieces fit together:
+ *
+ *   rolls ──buildFrames──▶ frames ──┬─▶ totalScore        (score shown under the sheet)
+ *                                   ├─▶ currentPosition   (which frame/roll is next)
+ *                                   ├─▶ pinsStanding      (max pins for the next roll)
+ *                                   ├─▶ isGameOver
+ *                                   └─▶ isValidRoll       (guards every new roll)
+ *
+ * 1. The store saves only the rolls: pin counts in the order they were thrown.
+ * 2. `buildFrames` groups them into the 10 frames of the score sheet and scores each one.
+ *    The store recomputes this whenever a roll is added.
+ * 3. Every other question about the game is answered from those frames.
+ *
+ * Racks: a rack is the set of pins standing on the lane. It is never stored; it is replayed
+ * from the rolls of one frame whenever it is needed, starting from `FRESH_RACK`. Two places
+ * need it, and both go through the same rule, `nextRack`:
+ * - `pinsStanding`: how many pins are left for the next roll of the current frame.
+ * - `rackRolls`: what each roll of a frame was thrown at, so the score sheet can tell a
+ *   strike or spare from a plain 10 or a plain count.
+ * In frames 1–9 there is one rack per frame. In frame 10 a strike or spare sets up a fresh
+ * rack within the same frame, which is why the rack has to be replayed instead of assumed.
  */
 
 export const FRAME_COUNT = 10;
 export const MAX_PINS = 10;
 
-/**
- * Number of consecutive rolls, starting at a frame's first roll, that make up its score.
- * Strike: 10 + next two rolls. Spare: both rolls + next roll. Open: both rolls.
- * This holds for frame 10 as well; its bonus rolls are simply played inside the frame.
- */
-const SCORED_ROLLS: Record<Exclude<FrameType, 'incomplete'>, number> = {
-  strike: 3,
-  spare: 3,
-  open: 2,
-};
-
-type Rack = Omit<RackRoll, 'pins'>;
-
+/** All 10 pins set up: the start of every frame, and of every new rack in frame 10. */
 const FRESH_RACK: Rack = { standing: MAX_PINS, isFirstBall: true };
 
+/**
+ * Whether a plain number is a possible result of one roll: a whole number from 0 to 10.
+ * As a type guard it narrows `number` to `PinCount`, e.g. for user input before it reaches
+ * the store. Whether the roll fits the current game is checked separately by `isValidRoll`.
+ */
 export function isPinCount(value: number): value is PinCount {
   return Number.isInteger(value) && value >= 0 && value <= MAX_PINS;
 }
@@ -69,11 +84,16 @@ export function pinsStanding(frames: readonly Frame[]): PinCount {
   return frame ? frame.rolls.reduce(nextRack, FRESH_RACK).standing : 0;
 }
 
+/** A roll is allowed while the game is running and it knocks down no more pins than are standing. */
 export function isValidRoll(frames: readonly Frame[], pins: PinCount): boolean {
   return !isGameOver(frames) && pins <= pinsStanding(frames);
 }
 
-/** Each roll of a frame with the rack it was thrown at, e.g. to tell a spare from a strike. */
+/**
+ * Each roll of a frame with the rack it was thrown at, e.g. to tell a spare from a strike.
+ * Frame 10 `[7, 3, 10]` gives 7 at 10 standing, 3 at 3 standing (spare),
+ * then 10 at a fresh rack (strike).
+ */
 export function rackRolls(frameRolls: readonly PinCount[]): RackRoll[] {
   let rack = FRESH_RACK;
   return frameRolls.map((pins) => {
@@ -83,7 +103,7 @@ export function rackRolls(frameRolls: readonly PinCount[]): RackRoll[] {
   });
 }
 
-/** Rolls a frame can hold: 2 in frames 1–9, 3 in frame 10 including its bonus rolls. */
+/** Boxes a frame has on the score sheet: 2 in frames 1–9, 3 in frame 10 including its bonus rolls. */
 export function maxRollsInFrame(frameNumber: number): number {
   return frameNumber === FRAME_COUNT ? 3 : 2;
 }
@@ -105,13 +125,20 @@ function frameType(frameRolls: readonly PinCount[]): FrameType {
   return first + second === MAX_PINS ? 'spare' : 'open';
 }
 
-/** `null` while the frame or its bonus rolls are still pending. */
+/**
+ * A frame scores a run of rolls starting at its first roll:
+ * strike = 10 + next two rolls, spare = both rolls + next roll, open = both rolls.
+ * So strikes and spares count 3 rolls, open frames 2. This holds for frame 10 as well;
+ * its bonus rolls are simply played inside the frame.
+ * `null` while the frame or its bonus rolls are still pending.
+ */
 function frameScore(rolls: readonly PinCount[], start: number, type: FrameType): number | null {
   if (type === 'incomplete') {
     return null;
   }
-  const scoredRolls = rolls.slice(start, start + SCORED_ROLLS[type]);
-  return scoredRolls.length === SCORED_ROLLS[type] ? sum(scoredRolls) : null;
+  const count = type === 'open' ? 2 : 3;
+  const scoredRolls = rolls.slice(start, start + count);
+  return scoredRolls.length === count ? sum(scoredRolls) : null;
 }
 
 /** The frame the next roll belongs to, or `undefined` when the game is over. */

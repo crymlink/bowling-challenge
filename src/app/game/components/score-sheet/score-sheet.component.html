@@ -1,10 +1,9 @@
-<section aria-labelledby="score-sheet-heading">
-  <h2 id="score-sheet-heading">Score sheet</h2>
+<section>
+  <h2>Score sheet</h2>
   <ol class="frames">
     @for (frame of frames(); track frame.number) {
-      @let isCurrent = frame.number === currentFrame();
-      <li [attr.aria-current]="isCurrent ? 'step' : null">
-        <app-frame [frame]="frame" [current]="isCurrent" />
+      <li>
+        <app-frame [frame]="frame" [current]="frame.number === currentFrame()" />
       </li>
     }
   </ol>

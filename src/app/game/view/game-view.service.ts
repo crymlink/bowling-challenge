@@ -5,7 +5,7 @@ import { RANDOM } from './random.token';
 
 /**
  * Orchestration for the game page: exposes the store state the screen needs,
- * builds labels and screen reader text, and turns user intent into store calls.
+ * builds labels and turns user intent into store calls.
  * Provided by the page component, so it lives and dies with it.
  */
 @Injectable()
@@ -24,18 +24,6 @@ export class GameViewService {
   readonly positionLabel = computed(() => {
     const position = this.store.currentPosition();
     return position ? `Frame ${position.frame} · Roll ${position.roll}` : 'Game over';
-  });
-
-  /** Text for the polite live region, so screen reader users hear the effect of each action. */
-  readonly announcement = computed(() => {
-    const position = this.store.currentPosition();
-    if (!position) {
-      return `Game over. Final score ${this.totalScore()}.`;
-    }
-    return (
-      `Frame ${position.frame}, roll ${position.roll}. ` +
-      `${this.maxPins()} pins standing. Total score ${this.totalScore()}.`
-    );
   });
 
   roll(pins: number): void {

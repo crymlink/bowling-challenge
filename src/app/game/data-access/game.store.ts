@@ -10,7 +10,7 @@ import {
 } from '../domain/bowling.rules';
 
 interface GameState {
-  readonly rolls: readonly number[];
+  readonly rolls: number[];
 }
 
 const initialState: GameState = { rolls: [] };

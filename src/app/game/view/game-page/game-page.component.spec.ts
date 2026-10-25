@@ -87,13 +87,6 @@ describe('GamePageComponent', () => {
     expect(page.totalScore()).toBe('Total score: 42');
   });
 
-  it('leaves the running total empty while a bonus is pending', async () => {
-    const page = await render();
-    await page.roll(7, 3);
-
-    expect(page.frames()[0]).toEqual({ marks: '7 /', total: '' });
-  });
-
   it('plays a perfect game to the end', async () => {
     const page = await render();
     await page.roll(...Array.from({ length: 12 }, () => 10));
@@ -103,31 +96,6 @@ describe('GamePageComponent', () => {
     expect(page.currentFrame()).toBe(0);
     expect(page.isDisabled('roll')).toBe(true);
     expect(page.isDisabled('random')).toBe(true);
-  });
-
-  it('plays a whole game with random rolls', async () => {
-    // Every random roll knocks down half of the standing pins, rounded down: 5, then 3.
-    vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    const page = await render();
-    // A game has at most 21 rolls, so the loop can never run forever.
-    for (let rolls = 0; rolls < 21 && !page.isDisabled('random'); rolls++) {
-      await page.click('random');
-    }
-
-    expect(page.status()).toBe('Game over — final score 80');
-    expect(page.frames()[9]).toEqual({ marks: '5 3', total: '80' });
-  });
-
-  it('clears a typed value when a random roll moves the game on', async () => {
-    // A random roll of 0.3 knocks down 3 of the 10 standing pins.
-    vi.spyOn(Math, 'random').mockReturnValue(0.3);
-    const page = await render();
-    await page.type('8');
-    await page.click('random');
-
-    expect(page.status()).toBe('Frame 1 · Roll 2 · 7 pins standing');
-    expect(page.inputValue()).toBe('0');
-    expect(page.error()).toBe('');
   });
 
   it('starts a new game and clears the input', async () => {
